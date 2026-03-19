@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TuturTataKata</title>
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+</head>
+<body>
+    <h1>Tutur Tata Kata</h1>
+    <h2>Cari definisi dan sinonim dari kata yang ingin kamu cari!</h2>
+    <form action="" method="post">
+        <input type="text" name="keyword">
+        <input type="submit" value="Cari">
+    </form>
+    {% if keyword %}
+    <h2>Definisi dan Kata Relevan dari kata: {{ keyword }}</h2>
+    {% endif %}
+    
+    {% if definitions %}
+    <h3>Definisi</h3>
+    <ul>
+        {% for definition in definitions%}
+            <li>{{ definition }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if relations %}
+    <h3>Kata Relevan</h3>
+    <ul>
+        {% for relevan in relations%}
+            <li>{{ relevan }} 
+                <form action="" method="post">
+                    <button type="button" class="btn-definisi" id="{{ relevan }}">definisi</button>
+                    <div id="def-{{ relevan }}"></div>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+</body>
+</html>
+
+<script>
+    button_definisi = document.querySelectorAll(".btn-definisi");
+    button_definisi.forEach((kata) => {
+        kata.addEventListener("click", async()=>{ 
+            response = await fetch('/api/definisi/' + kata.id)
+            definisi = await response.json()
+            document.getElementById("def-"+kata.id).innerHTML = definisi;
+        })
+    })
+</script>
