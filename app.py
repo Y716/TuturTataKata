@@ -6,6 +6,9 @@ from flask import Flask, render_template, request, redirect, url_for
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 
+# TODO: Bikin respon kalau search bar kosong atau kata yang dikirim tidak ada definisinya
+
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     hasil_definisi = []
@@ -52,25 +55,21 @@ def definisi_kata(kata):
     return flask.jsonify(definisi)
 
 def cari_kata(kata: str) -> tuple[list, list]:
+    definitions = []
+    relations = {}
     try:
         url = 'https://kateglo.lostfocus.org/api.php?format=json&phrase='+kata
         r = requests.get(url, timeout=5)
-        r.raise_for_status()
+        if 'application/json' not in r.headers.get('Content-Type', ''):
+            return definitions, relations
         data = r.json()
     except requests.exceptions.RequestException as e:
         print(f"Terjadi Kesalahan: {e}")
         data = None
-        return
-    definitions = []
     
     for i in range(len(data['kateglo']['definition'])):
-        try:
-            definitions.append(data['kateglo']['definition'][i]['def_text'])
-        except requests.exceptions.RequestException as e:
-            print(f"Terjadi Kesalahan: {e}")
-            data = None
+        definitions.append(data['kateglo']['definition'][i]['def_text'])
     
-    relations = {}
     for i in range(len(data['kateglo']['relation']['s'])-1):
         kata = data['kateglo']['relation']['s'][str(i)]['related_phrase']
         relations[kata] = data['kateglo']['relation']['s'][str(i)]['rel_type_name']
