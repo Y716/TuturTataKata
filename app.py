@@ -1,5 +1,6 @@
 import requests
 import flask
+import random
 from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
@@ -29,6 +30,12 @@ def index():
                            relations = hasil_kata_relevan,
                            keyword = kata_dicari,
                            )
+
+@app.route("/random")
+def pilihan():
+    list = ["Renjana", "Prakarsa", "Senandika", "Hidup"]
+    kata_terpilih = random.choice(list)
+    return redirect(url_for('index', q=kata_terpilih))
 
 @app.route("/api/definisi/<string:kata>")
 def definisi_kata(kata):
