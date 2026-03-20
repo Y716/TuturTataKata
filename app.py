@@ -34,7 +34,16 @@ def index():
 @app.route("/random")
 def pilihan():
     list = ["Renjana", "Prakarsa", "Senandika", "Hidup"]
-    kata_terpilih = random.choice(list)
+    
+    f = open("random_list.txt")
+    
+    f = open("random_list.txt")
+    kata_acak = f.read().split()
+    
+    if len(kata_acak) == 0:
+        kata_terpilih = random.choice(list)
+    else:
+        kata_terpilih = random.choice(kata_acak)
     return redirect(url_for('index', q=kata_terpilih))
 
 @app.route("/api/definisi/<string:kata>")
@@ -63,7 +72,14 @@ def cari_kata(kata: str) -> tuple[list, list]:
     
     relations = {}
     for i in range(len(data['kateglo']['relation']['s'])-1):
-        relations[data['kateglo']['relation']['s'][str(i)]['related_phrase']] = data['kateglo']['relation']['s'][str(i)]['rel_type_name']
+        kata = data['kateglo']['relation']['s'][str(i)]['related_phrase']
+        relations[kata] = data['kateglo']['relation']['s'][str(i)]['rel_type_name']
+        
+        f = open("random_list.txt")
+        list_kata = f.read().split()
+        if kata not in list_kata:
+            with open("random_list.txt", "a") as f:
+                f.write(f"{data['kateglo']['relation']['s'][str(i)]['related_phrase']}\n")
     return definitions, relations
 
 def jabar_kata(kata: str) -> list:
